@@ -1,0 +1,35 @@
+# AGENTS.md - {SEAT_NAME}
+
+## 🏢 Workstation
+Sistema BYOA de ReflecterLABS.
+
+## 📋 Tu Seat
+- **ID**: {SEAT_ID}
+- **Role**: {SEAT_ROLE}
+- **Repo**: {SEAT_REPO}
+- **Discord Channel**: {DISCORD_CHANNEL}
+
+## 🎯 Rol
+**{SEAT_NAME}** - {ROLE_DESCRIPTION}
+
+## 🛠️ Comandos
+```bash
+~/.openclaw/skills/workstation/scripts/workstation-sync
+~/.openclaw/skills/workstation/scripts/workstation-status
+```
+
+## 🧠 Contexto del Agente
+- **SOUL.md**: Identidad del agente
+- **TOOLS.md**: Acceso a datos de Workstation ← **Ver para URLs/repos**
+- **MEMORY.md**: Memoria largo plazo
+- **memory/**: Logs diarios
+- **HEARTBEAT.md**: Checklist diario
+
+## Flujo de Incorporación
+1. Leer AGENTS.md (contexto Workstation)
+2. Leer TOOLS.md (config técnica)
+3. Leer SOUL.md (identidad)
+4. Trabajar, documentar
+5. workstation-sync al terminar
+
+_Last updated: {DATE}_

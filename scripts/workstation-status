@@ -1,0 +1,33 @@
+#!/bin/bash
+# workstation-status - Muestra estado de todos los seats
+
+echo "🪑 ReflecterLABS Agent Team - Estado de Workstation"
+echo "===================================================="
+echo ""
+
+AGENTS_DIR="$HOME/.openclaw/workspace/agents"
+
+for seat_dir in "$AGENTS_DIR"/*/; do
+    if [ -d "$seat_dir/.git" ]; then
+        seat_name=$(basename "$seat_dir")
+        cd "$seat_dir"
+        
+        # Verificar cambios sin commitear
+        uncommitted=$(git status --short | wc -l)
+        
+        # Verificar si hay commits sin push
+        unpushed=$(git rev-list --count origin/main..main 2>/dev/null || echo "0")
+        
+        # Último commit
+        last_commit=$(git log -1 --format="%cr" 2>/dev/null || echo "nunca")
+        
+        if [ "$uncommitted" -eq 0 ] && [ "$unpushed" -eq 0 ]; then
+            echo "✅ $seat_name - Sincronizado (último: $last_commit)"
+        else
+            echo "⚠️  $seat_name - $uncommitted sin commit, $unpushed sin push"
+        fi
+    fi
+done
+
+echo ""
+echo "💡 Usa 'workstation-sync' para sincronizar tu seat"

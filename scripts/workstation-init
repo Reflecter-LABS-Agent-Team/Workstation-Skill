@@ -1,0 +1,34 @@
+#!/bin/bash
+# workstation-init - Setup inicial de Workstation
+
+echo "🚀 Inicializando ReflecterLABS Workstation"
+echo "=========================================="
+echo ""
+
+# Crear directorios
+mkdir -p ~/Workstation/ReflecterLABS-AgentTeam
+mkdir -p ~/.openclaw/workspace/agents
+
+# Crear .env si no existe
+ENV_FILE="$HOME/Workstation/ReflecterLABS-AgentTeam/.env"
+if [ ! -f "$ENV_FILE" ]; then
+    cat > "$ENV_FILE" << 'EOF'
+# GitHub Token con permisos de repo
+GITHUB_TOKEN=""
+
+# Organización
+GITHUB_ORG="Reflecter-LABS-Agent-Team"
+EOF
+    echo "📝 Creado: $ENV_FILE"
+    echo "   Por favor, edita el archivo y agrega tu GITHUB_TOKEN"
+else
+    echo "✅ Configuración ya existe: $ENV_FILE"
+fi
+
+echo ""
+echo "✅ Workstation inicializado"
+echo ""
+echo "Próximos pasos:"
+echo "  1. Edita ~/Workstation/ReflecterLABS-AgentTeam/.env"
+echo "  2. Agrega tu GITHUB_TOKEN"
+echo "  3. Usa 'workstation-sync' para sincronizar tu seat"

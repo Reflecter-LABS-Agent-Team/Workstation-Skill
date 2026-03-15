@@ -1,0 +1,25 @@
+# TOOLS.md - Workstation Access
+
+## Mi Seat
+- **ID**: {SEAT_ID}
+- **Repositorio**: https://github.com/Reflecter-LABS-Agent-Team/{SEAT_REPO}
+- **Ruta local**: ~/.openclaw/workspace/agents/{SEAT_NAME}
+- **Branch**: main
+
+## Workstation Config
+- **Skill path**: ~/.openclaw/skills/workstation/
+- **Scripts**: ~/.openclaw/skills/workstation/scripts/
+- **SSOT**: ~/Workstation/ReflecterLABS-AgentTeam/
+
+## Comandos Disponibles
+| Comando | Descripción |
+|---------|-------------|
+| `workstation-sync` | Sincroniza cambios a GitHub |
+| `workstation-status` | Muestra estado de todos los seats |
+
+## Flujo de Trabajo
+```
+HEARTBEAT → Trabajo → workstation-sync
+```
+
+_Last updated: {DATE}_

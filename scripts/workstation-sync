@@ -1,0 +1,37 @@
+#!/bin/bash
+# workstation-sync - Sincroniza el seat actual con GitHub
+
+SEAT_NAME=${1:-$(basename $(pwd))}
+ENV_FILE="${ENV_FILE:-$HOME/Workstation/ReflecterLABS-AgentTeam/.env}"
+
+# Load token
+if [ -f "$ENV_FILE" ]; then
+    source "$ENV_FILE"
+fi
+
+if [ -z "$GITHUB_TOKEN" ]; then
+    echo "❌ Error: GITHUB_TOKEN no configurado"
+    echo "Verifica $ENV_FILE"
+    exit 1
+fi
+
+cd ~/.openclaw/workspace/agents/$SEAT_NAME 2>/dev/null || {
+    echo "❌ Error: No se encuentra el seat $SEAT_NAME"
+    exit 1
+}
+
+# Configurar remote con token
+REPO_URL="https://x-access-token:${GITHUB_TOKEN}@github.com/Reflecter-LABS-Agent-Team/seat-${SEAT_NAME,,}.git"
+git remote set-url origin "$REPO_URL" 2>/dev/null || git remote add origin "$REPO_URL"
+
+# Sync
+git add -A
+git commit -m "$(date +'%Y-%m-%d %H:%M') - Sync" || true
+git push -u origin main --force
+
+if [ $? -eq 0 ]; then
+    echo "✅ Seat '$SEAT_NAME' sincronizado con GitHub"
+else
+    echo "❌ Error al sincronizar"
+    exit 1
+fi
