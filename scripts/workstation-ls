@@ -1,0 +1,49 @@
+#!/bin/bash
+# workstation-ls - Lista todos los repos de la Workstation
+
+WORKSTATION_JSON="${WORKSTATION_JSON:-$HOME/Workstation/ReflecterLABS-AgentTeam/workstation.json}"
+
+echo "🪑 Workstation Repositories"
+echo "==========================="
+echo ""
+
+python3 <<PYEOF
+import json
+import os
+
+ws_file = os.path.expanduser("$WORKSTATION_JSON")
+
+try:
+    with open(ws_file) as f:
+        data = json.load(f)
+    
+    print("📦 Seats")
+    print("--------")
+    for seat in data.get('seats', []):
+        status = "✅" if seat.get('status') == 'active' else "⚠️"
+        print(f"{status} {seat.get('name', 'Unknown'):12} | {seat.get('id')}")
+        print(f"   Repo: {seat.get('github_repo', 'N/A')}")
+        print(f"   Local: {seat.get('workspace_path', 'N/A')}")
+        print(f"   Discord: {seat.get('discord_channel_id', 'N/A')}")
+        print()
+    
+    print("📚 Knowledge Bases")
+    print("------------------")
+    for kb in data.get('kbs', []):
+        access = ', '.join(kb.get('seats_with_access', []))
+        print(f"📖 {kb.get('name', 'Unknown')} ({kb.get('id')})")
+        print(f"   Repo: {kb.get('github_repo', 'N/A')}")
+        print(f"   Local: {kb.get('local_path', 'N/A')}")
+        print(f"   Access: {access}")
+        print()
+    
+    print("⚙️  Settings")
+    print("-----------")
+    settings = data.get('settings', {})
+    print(f"SSOT: {settings.get('ssot_repo', 'N/A')}")
+    print(f"Skill: {settings.get('skill_repo', 'N/A')}")
+    print(f"Sync interval: {settings.get('sync_interval_minutes', 'N/A')} min")
+        
+except Exception as e:
+    print(f"Error: {e}")
+PYEOF

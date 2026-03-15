@@ -1,0 +1,68 @@
+#!/bin/bash
+# workstation-kb-sync - Sincroniza Knowledge Bases con GitHub
+
+ENV_FILE="${ENV_FILE:-$HOME/Workstation/ReflecterLABS-AgentTeam/.env}"
+
+# Load token
+if [ -f "$ENV_FILE" ]; then
+    source "$ENV_FILE"
+fi
+
+if [ -z "$GITHUB_TOKEN" ]; then
+    echo "❌ Error: GITHUB_TOKEN no configurado"
+    exit 1
+fi
+
+KB_NAME=$1
+WORKSTATION_BASE="${WORKSTATION_BASE:-$HOME/Workstation}"
+
+echo "📚 Sincronizando Knowledge Bases"
+echo "================================"
+echo ""
+
+sync_kb() {
+    local kb_path=$1
+    local kb_name=$(basename "$kb_path")
+    
+    if [ ! -d "$kb_path/.git" ]; then
+        echo "⚠️  $kb_name no es un repo Git, saltando..."
+        return
+    fi
+    
+    cd "$kb_path"
+    
+    # Configurar remote con token si no está configurado
+    local repo_name=$(echo "$kb_name" | tr '[:upper:]' '[:lower:]')
+    local repo_url="https://x-access-token:${GITHUB_TOKEN}@github.com/Reflecter-LABS-Agent-Team/${repo_name}.git"
+    
+    git remote set-url origin "$repo_url" 2>/dev/null || git remote add origin "$repo_url" 2>/dev/null || true
+    
+    # Verificar cambios
+    local uncommitted=$(git status --short | wc -l)
+    local unpushed=$(git rev-list --count origin/main..main 2>/dev/null || echo "0")
+    
+    if [ "$uncommitted" -gt 0 ] || [ "$unpushed" -gt 0 ]; then
+        echo "🔄 Sincronizando $kb_name..."
+        git add -A
+        git commit -m "$(date +'%Y-%m-%d %H:%M') - KB sync" || true
+        git push -u origin main --force
+        echo "✅ $kb_name sincronizado"
+    else
+        echo "✅ $kb_name - ya está sincronizado"
+    fi
+    echo ""
+}
+
+if [ -n "$KB_NAME" ]; then
+    # Sincronizar KB específica
+    sync_kb "$WORKSTATION_BASE/KB-$KB_NAME"
+else
+    # Sincronizar todas las KBs
+    for kb in "$WORKSTATION_BASE"/KB-*; do
+        if [ -d "$kb" ]; then
+            sync_kb "$kb"
+        fi
+    done
+fi
+
+echo "✅ Sincronización de KBs completada"

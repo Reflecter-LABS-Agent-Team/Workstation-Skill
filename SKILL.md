@@ -1,6 +1,6 @@
 ---
 name: workstation
-description: ReflecterLABS Agent Team Workstation - Git-backed persistence for AI agents. Use for seat sync, status checks, and workstation operations. Triggers on "workstation", "seat sync", "agent status".
+description: ReflecterLABS Agent Team Workstation - Git-backed persistence for AI agents. Use for seat sync, KB sync, listing repos, and workstation operations. Triggers on "workstation", "seat sync", "kb sync", "list repos", "workstation.json".
 ---
 
 # Workstation Skill
@@ -21,18 +21,120 @@ Cada **agente** tiene un **Seat** - un directorio Git-backed con:
 
 ---
 
-## Comandos Esenciales
+## 📋 workstation.json - Fuente Central de Verdad
+
+**Ubicación**: `~/Workstation/ReflecterLABS-AgentTeam/workstation.json`
+
+Este archivo contiene toda la configuración de la Workstation:
+- **Seats**: Todos los agentes del equipo
+- **KBs**: Knowledge Bases compartidas
+- **Repos**: URLs de GitHub para cada recurso
+- **Settings**: Configuración general
+
+### Estructura
+
+```json
+{
+  "seats": [
+    {
+      "id": "commander",
+      "name": "Commander",
+      "github_repo": "https://github.com/.../seat-commander",
+      "workspace_path": "~/.openclaw/workspace/agents/Commander",
+      "discord_channel_id": "1482427420094107669"
+    }
+  ],
+  "kbs": [
+    {
+      "id": "kb-core",
+      "name": "Core Knowledge Base",
+      "github_repo": "https://github.com/.../kb-core",
+      "local_path": "~/Workstation/KB-Core",
+      "seats_with_access": ["all"]
+    }
+  ],
+  "settings": {
+    "ssot_repo": "https://github.com/.../SSOT",
+    "skill_repo": "https://github.com/.../Workstation-Skill"
+  }
+}
+```
+
+### Comandos para Consultar
 
 ```bash
-# Sincronizar (SIEMPRE al terminar)
+# Listar todos los repos (seats, KBs, projects)
+~/.openclaw/skills/workstation/scripts/workstation-ls
+```
+
+---
+
+## 🛠️ Comandos Esenciales
+
+### Seats (Agentes)
+```bash
+# Sincronizar tu seat (SIEMPRE al terminar)
 ~/.openclaw/skills/workstation/scripts/workstation-sync
 
-# Ver estado del equipo
+# Ver estado de todos los seats
 ~/.openclaw/skills/workstation/scripts/workstation-status
+```
+
+### Knowledge Bases
+```bash
+# Sincronizar KBs (después de editar archivos compartidos)
+~/.openclaw/skills/workstation/scripts/workstation-kb-sync
+
+# Sincronizar KB específica
+~/.openclaw/skills/workstation/scripts/workstation-kb-sync Core
+```
+
+### Información
+```bash
+# Listar todos los repos configurados
+~/.openclaw/skills/workstation/scripts/workstation-ls
 
 # Setup inicial
 ~/.openclaw/skills/workstation/scripts/workstation-init
 ```
+
+---
+
+## 📚 Knowledge Bases (KBs)
+
+### ¿Qué son las KBs?
+
+**Knowledge Bases** = Repositorios Git compartidos entre agentes.
+
+Ubicación local: `~/Workstation/KB-{nombre}/`
+
+### KBs Configuradas
+
+| KB | Descripción | Acceso | Local Path |
+|----|-------------|--------|------------|
+| **KB-Core** | Conocimiento organizacional | Todos los agentes | `~/Workstation/KB-Core/` |
+| **KB-Projects** | Proyectos activos | Commander, Manager, Engineer | `~/Workstation/KB-Projects/` |
+| **KB-Market** | Inteligencia de mercado | Marketing, Seller, Newscaster, Researcher | `~/Workstation/KB-Market/` |
+
+### Cómo se Accede
+
+Cada agente tiene **symlinks** en su seat:
+```
+~/.openclaw/workspace/agents/{Seat}/
+└── imports/
+    ├── KB-Core/ → ~/Workstation/KB-Core/
+    ├── KB-Projects/ → ~/Workstation/KB-Projects/
+    └── KB-Market/ → ~/Workstation/KB-Market/
+```
+
+### Flujo de Trabajo con KBs
+
+1. **Leer**: Accede normalmente via `imports/KB-{nombre}/`
+2. **Editar**: Modifica archivos (si tienes permiso)
+3. **Sincronizar**: Ejecuta `workstation-kb-sync` para subir cambios
+4. **Otros agentes**: Ven los cambios al sincronizar sus seats
+
+**Importante**: Las KBs son **compartidas**. Tus cambios afectan a todos los agentes con acceso.
 
 ---
 
@@ -66,103 +168,100 @@ AGENTS.md (punto de entrada)
 
 4. **Trabajar**
    - Documentar en memory/YYYY-MM-DD.md
+   - Usar imports/KB-*/ para conocimiento compartido
 
 5. **Sincronizar**
-   - `workstation-sync` al terminar
+   - `workstation-sync` para tu seat
+   - `workstation-kb-sync` si editaste KBs
 
 ---
 
-## 📂 Estructura de Archivos por Agente
+## 📂 Estructura Completa
 
-### AGENTS.md (OBLIGATORIO - Leer primero)
-Contiene:
-- Qué es Workstation
-- Tu rol en el equipo
-- Referencia a TOOLS.md ("Ver para URLs/repos")
-- Flujo de incorporación
-- Comandos básicos
+### Sistema de Archivos
 
-### TOOLS.md (OBLIGATORIO - Leer segundo)
-Contiene:
-```markdown
-## Mi Seat
-- **ID**: {seat-id}
-- **Repositorio**: https://github.com/.../seat-{nombre}
-- **Ruta local**: ~/.openclaw/workspace/agents/{Nombre}
-- **Branch**: main
+```
+~/Workstation/                          # Workstation base
+├── ReflecterLABS-AgentTeam/
+│   ├── workstation.json               # ← FUENTE CENTRAL
+│   └── .env                           # Configuración local
+├── KB-Core/                           # Knowledge Base compartida
+├── KB-Projects/                       # Knowledge Base compartida
+└── KB-Market/                         # Knowledge Base compartida
 
-## Workstation Config
-- **Skill path**: ~/.openclaw/skills/workstation/
-- **SSOT**: ~/Workstation/ReflecterLABS-AgentTeam/
-
-## Comandos Disponibles
-| Comando | Descripción |
-|---------|-------------|
-| `workstation-sync` | Sincroniza cambios a GitHub |
+~/.openclaw/
+├── skills/workstation/ → ~/Workstation-Skill  # Skill (symlink)
+└── workspace/agents/
+    ├── Commander/                     # Seat individual
+    │   ├── AGENTS.md
+    │   ├── TOOLS.md
+    │   ├── SOUL.md
+    │   ├── MEMORY.md
+    │   ├── HEARTBEAT.md
+    │   ├── memory/
+    │   └── imports/                   # Symlinks a KBs
+    │       ├── KB-Core/ → ~/Workstation/KB-Core/
+    │       └── ...
+    ├── Manager/
+    ├── Engineer/
+    └── ...
 ```
 
-### Resto de archivos
-- **SOUL.md** - Identidad
-- **MEMORY.md** - Memoria largo plazo
-- **HEARTBEAT.md** - Checklist diario
-- **memory/** - Logs diarios
+### Repositorios GitHub
+
+| Tipo | Repositorio | Ejemplo |
+|------|-------------|---------|
+| **SSOT** | Configuración central | `SSOT-ReflecterLABS-Agent-Team` |
+| **Skill** | Esta skill | `Workstation-Skill` |
+| **Seats** | Uno por agente | `seat-commander`, `seat-manager`... |
+| **KBs** | Uno por KB | `kb-core`, `kb-projects`, `kb-market` |
 
 ---
 
-## 📁 Estructura de la Skill
+## 🔄 Flujo de Trabajo Completo
 
-```
-workstation/
-├── SKILL.md                    # Este archivo
-├── README.md                   # Documentación
-├── scripts/
-│   ├── workstation-init        # Setup inicial
-│   ├── workstation-sync        # Sincronizar seat
-│   ├── workstation-status      # Ver estado
-│   ├── create-seat.sh          # Crear nuevo seat
-│   └── clone-seat.sh           # Clonar seat existente
-└── templates/
-    ├── AGENTS.md.template      # Template para AGENTS.md
-    └── TOOLS.md.template       # Template para TOOLS.md
-```
+### Al Iniciar Sesión
+1. Leer **AGENTS.md** (contexto Workstation)
+2. Leer **TOOLS.md** (config técnica)
+3. Leer **SOUL.md** (identidad)
+4. Revisar **HEARTBEAT.md**
 
----
+### Durante la Sesión
+5. Trabajar normalmente
+6. Usar **imports/KB-*/** para conocimiento compartido
+7. Documentar en **memory/YYYY-MM-DD.md**
+8. Decisiones importantes → **MEMORY.md**
 
-## 🆕 Incorporar Agente Existente
-
-Si hay un agente en `~/.openclaw/workspace/agents/{Nombre}` sin Workstation:
-
-### 1. Crear AGENTS.md y TOOLS.md desde templates
-### 2. Crear Repo GitHub
-```bash
-~/.openclaw/skills/workstation/scripts/create-seat.sh "Nombre" "rol"
-```
-
-### 3. Sincronizar
-```bash
-~/.openclaw/skills/workstation/scripts/workstation-sync
-```
-
----
-
-## 🔄 Flujo de Trabajo Diario
-
-1. **Inicio**: AGENTS.md → TOOLS.md → SOUL.md
-2. **Trabajo**: Documentar en archivos
-3. **Fin**: `workstation-sync`
+### Al Terminar (IMPORTANTE)
+9. **workstation-sync** (siempre)
+10. **workstation-kb-sync** (solo si editaste KBs)
 
 ---
 
 ## 🆘 Troubleshooting
 
 ### "¿Cuál es mi repo?"
-Leer TOOLS.md - ahí está la URL.
+```bash
+~/.openclaw/skills/workstation/scripts/workstation-ls
+# O leer TOOLS.md en tu seat
+```
 
-### "¿Dónde están los comandos?"
-Leer TOOLS.md - tabla de comandos.
+### "¿Dónde están las KBs?"
+```bash
+ls ~/Workstation/KB-*/
+# O en tu seat: ls imports/KB-*/
+```
 
-### "¿Cómo incorporo Workstation?"
-Flujo: AGENTS.md → TOOLS.md → SOUL.md → trabajo → sync
+### "¿Cómo sincronizo KBs?"
+```bash
+~/.openclaw/skills/workstation/scripts/workstation-kb-sync
+```
+
+### "¿Qué repos existen?"
+```bash
+# Ver workstation.json
+~/.openclaw/skills/workstation/scripts/workstation-ls
+```
 
 ---
 
