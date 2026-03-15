@@ -1,0 +1,39 @@
+#!/bin/bash
+# workstation-global-check - Revisa menciones en el canal global
+
+ENV_FILE="${ENV_FILE:-$HOME/Workstation/ReflecterLABS-AgentTeam/.env}"
+AGENT_NAME=$1
+GLOBAL_CHANNEL="1482524442482442282"
+
+if [ -z "$AGENT_NAME" ]; then
+    echo "Uso: workstation-global-check <agent-name>"
+    echo "Ejemplo: workstation-global-check Commander"
+    exit 1
+fi
+
+# Convertir nombre a ID (primera letra mayúscula, resto minúscula)
+AGENT_ID=$(echo "$AGENT_NAME" | tr '[:upper:]' '[:lower:]')
+
+echo "🔍 Revisando menciones de @${AGENT_NAME} en canal global..."
+echo "Canal: ${GLOBAL_CHANNEL}"
+echo ""
+
+# Nota: Este es un placeholder. En implementación real,
+# esto consultaría la API de Discord para mensajes recientes
+
+echo "📋 Instrucciones:"
+echo "================="
+echo ""
+echo "Para responder en el canal global:"
+echo "1. Revisa el canal <#${GLOBAL_CHANNEL}> manualmente"
+echo "2. Si te mencionan (@${AGENT_NAME}), responde allí"
+echo "3. Usa reacciones (👍 ✅) para ACK simple"
+echo ""
+echo "Reglas de respuesta:"
+echo "- Responder SI te mencionan (@${AGENT_NAME})"
+echo "- Responder SI es un broadcast general"
+echo "- Usar reacciones SI solo es ACK"
+echo "- NO responder si no te mencionan"
+echo ""
+echo "Para acceder al canal:"
+echo "https://discord.com/channels/1426229106642780283/${GLOBAL_CHANNEL}"
