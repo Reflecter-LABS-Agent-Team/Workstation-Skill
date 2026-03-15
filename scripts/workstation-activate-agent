@@ -1,0 +1,67 @@
+#!/bin/bash
+# workstation-activate-agent - Activa un agente específico en el canal global
+
+AGENT_NAME=$1
+AGENT_ID=$(echo "$AGENT_NAME" | tr '[:upper:]' '[:lower:]')
+GLOBAL_CHANNEL="1482524442482442282"
+
+if [ -z "$AGENT_NAME" ]; then
+    echo "Uso: workstation-activate-agent <AgentName>"
+    echo "Ejemplo: workstation-activate-agent Manager"
+    echo ""
+    echo "Activa una sesión del agente en el canal global de reunión"
+    exit 1
+fi
+
+echo "🚀 Activando agente: $AGENT_NAME"
+echo "================================"
+echo ""
+echo "Canal Global: #agenteam-reflecterlabs ($GLOBAL_CHANNEL)"
+echo "Agente: $AGENT_NAME (ID: $AGENT_ID)"
+echo ""
+
+# Verificar que el seat existe
+SEAT_PATH="$HOME/.openclaw/workspace/agents/$AGENT_NAME"
+if [ ! -d "$SEAT_PATH" ]; then
+    echo "❌ Error: Seat no encontrado en $SEAT_PATH"
+    exit 1
+fi
+
+echo "✅ Seat encontrado: $SEAT_PATH"
+echo ""
+
+# Leer identidad del agente
+if [ -f "$SEAT_PATH/IDENTITY.md" ]; then
+    EMOJI=$(grep "Emoji:" "$SEAT_PATH/IDENTITY.md" | cut -d: -f2 | tr -d ' ' || echo "🤖")
+    echo "Emoji: $EMOJI"
+fi
+
+if [ -f "$SEAT_PATH/SOUL.md" ]; then
+    ROLE=$(grep -m1 "^# SOUL.md" "$SEAT_PATH/SOUL.md" | sed 's/# SOUL.md - //' || echo "Agent")
+    echo "Rol: $ROLE"
+fi
+
+echo ""
+echo "📋 Instrucciones de activación:"
+echo "================================"
+echo ""
+echo "Para activar $AGENT_NAME en el canal global:"
+echo ""
+echo "1. La sesión debe estar configurada en OpenClaw Gateway"
+echo "   - Canal: $GLOBAL_CHANNEL"
+echo "   - Agente: $AGENT_NAME"
+echo "   - Seat: $SEAT_PATH"
+echo ""
+echo "2. Archivos a cargar al iniciar sesión:"
+echo "   - $SEAT_PATH/SOUL.md (identidad)"
+echo "   - $SEAT_PATH/AGENTS.md (contexto)"
+echo "   - $SEAT_PATH/TOOLS.md (configuración)"
+echo ""
+echo "3. Comportamiento esperado:"
+echo "   - Responder cuando se le mencione (@$AGENT_NAME)"
+echo "   - Mantener silencio si no se le menciona"
+echo "   - Usar reacciones para ACK simple"
+echo ""
+echo "4. Para probar, menciona al agente en:"
+echo "   https://discord.com/channels/1426229106642780283/$GLOBAL_CHANNEL"
+echo ""

@@ -1,0 +1,23 @@
+#!/bin/bash
+# workstation-agent-session - Script de sesión para un agente específico
+# Este script se ejecuta vía cron para mantener "vivos" a los agentes en el canal global
+
+AGENT_NAME=$1
+CHANNEL_ID=$2
+
+if [ -z "$AGENT_NAME" ] || [ -z "$CHANNEL_ID" ]; then
+    echo "Uso: workstation-agent-session <AgentName> <ChannelID>"
+    exit 1
+fi
+
+SEAT_PATH="$HOME/.openclaw/workspace/agents/$AGENT_NAME"
+LOG_FILE="$HOME/.openclaw/logs/agent-${AGENT_NAME,,}-global.log"
+
+mkdir -p "$HOME/.openclaw/logs"
+
+echo "[$(date -Iseconds)] Heartbeat: $AGENT_NAME en canal $CHANNEL_ID" >> "$LOG_FILE"
+
+# Verificar si hay menciones recientes (simulado - en producción consultaría API)
+# Por ahora solo loguea que el agente está "vivo"
+
+echo "[$(date -Iseconds)] $AGENT_NAME activo y escuchando" >> "$LOG_FILE"

@@ -1,0 +1,10 @@
+# Activación de Agentes en Canal Global
+# Cada agente se activa cada 2 minutos para revisar el canal de reunión
+
+*/2 * * * * /home/openclaw/.openclaw/skills/workstation/scripts/workstation-agent-session.sh Manager 1482524442482442282
+*/2 * * * * /home/openclaw/.openclaw/skills/workstation/scripts/workstation-agent-session.sh Engineer 1482524442482442282
+*/2 * * * * /home/openclaw/.openclaw/skills/workstation/scripts/workstation-agent-session.sh Researcher 1482524442482442282
+*/2 * * * * /home/openclaw/.openclaw/skills/workstation/scripts/workstation-agent-session.sh Marketing 1482524442482442282
+*/2 * * * * /home/openclaw/.openclaw/skills/workstation/scripts/workstation-agent-session.sh Seller 1482524442482442282
+*/2 * * * * /home/openclaw/.openclaw/skills/workstation/scripts/workstation-agent-session.sh Newscaster 1482524442482442282
+*/2 * * * * /home/openclaw/.openclaw/skills/workstation/scripts/workstation-agent-session.sh DevOps 1482524442482442282
